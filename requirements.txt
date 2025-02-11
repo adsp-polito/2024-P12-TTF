@@ -1,0 +1,12 @@
+ipykernel
+torch
+pandas
+numpy
+statsmodels
+scipy
+matplotlib
+scikit-learn
+ipykernel
+tensorflow
+joblib
+ipympl
