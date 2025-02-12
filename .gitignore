@@ -156,3 +156,4 @@ cython_debug/
 test.py
 results*
 targets*
+!docs/results.png
