@@ -9,24 +9,11 @@ def align(y_pred: np.ndarray, cycles: np.ndarray, trajectory_id: np.ndarray):
     df['RUL'] = df['pred'] + df['Cycle'] - df.groupby('TrajectoryID')['Cycle'].transform('max')
     return df
 
-def aggregate(y_pred: pd.DataFrame, y: np.ndarray, N_last: int = AGG_LAST, method: Callable[[int], float | int] = AGG_METHOD):
+def aggregate(y_pred: pd.DataFrame, y: np.ndarray, N_last: int = AGG_LAST, N_last2: int = AGG_LAST2, method: Callable[[int], float | int] = AGG_METHOD):
     RULs = []
     y_pred['truth'] = y
     agg_truths = []
-    for tid, result in y_pred.groupby('TrajectoryID'):
-        results_to_be_considered = result['RUL'].iloc[-N_last:].values
-        weights = method(np.arange(len(results_to_be_considered)) + N_last - len(results_to_be_considered) + 1)
-        # if N_last results are avaible, weights = 1...N_last
-        # if N < N_last reasults are avaibale, weights = N_last - N...N_last
-        RULs.append(np.sum(results_to_be_considered*weights)/np.sum(weights))
-        agg_truths.append(result['truth'].min())
-    return np.array(RULs), np.array(agg_truths)
-
-def aggregate2(y_pred: pd.DataFrame, y: np.ndarray, N_last: int = AGG_LAST, N_last2: int = AGG_LAST2, method: Callable[[int], float | int] = AGG_METHOD):
-    RULs = []
-    y_pred['truth'] = y
-    agg_truths = []
-    for tid, result in y_pred.groupby('TrajectoryID'):
+    for _tid, result in y_pred.groupby('TrajectoryID'):
         results_overall =  result['RUL'].iloc[-N_last2:].values
         weights = method(np.arange(len(results_overall)) + N_last - len(results_overall) + 1)
         rul = np.mean(np.sum(results_overall*weights)/np.sum(weights))

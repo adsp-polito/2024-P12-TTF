@@ -93,9 +93,18 @@ def _evaluate(model, dataloader, criterion, device):
             total_loss += loss.item()
     return total_loss / len(dataloader)
 
-def train(X_train: np.ndarray, y_train: np.ndarray, X_val, y_val, path: str, learnable_positional_encoding: bool):
+def train(
+    X_train: np.ndarray,
+    y_train: np.ndarray,
+    X_val: np.ndarray,
+    y_val: np.ndarray,
+    path: str,
+    learnable_positional_encoding: bool,
+    pretrain_epochs: int= PRETRAIN_EPOCHS,
+):
 
     n_features = X_train.shape[2]
+    window_size = X_train.shape[1]
 
     # --- Convert numpy arrays to PyTorch tensors ---
     X_tensor = torch.tensor(X_train, dtype=torch.float32)
@@ -135,25 +144,25 @@ def train(X_train: np.ndarray, y_train: np.ndarray, X_val, y_val, path: str, lea
     # --- Pretraining ---
     masked_model = MaskedPredictionModel(
         input_dim=n_features,
-        seq_len=WINDOW_SIZE,
+        seq_len=window_size,
         d_model=D_MODEL,
         n_heads=N_HEADS,
         n_layers=N_LAYERS,
         feedforward_dim=FEEDFORWARD_DIM,
         dropout=DROPOUT,
-        learnable_positional_encoding=learnable_positional_encoding
+        learnable_positional_encoding=learnable_positional_encoding,
     ).to(_device)
 
     optimizer = torch.optim.Adam(masked_model.parameters(), lr=1e-4, weight_decay=1e-5)
     criterion = nn.MSELoss()
 
-    for epoch in range(PRETRAIN_EPOCHS):
+    for epoch in range(pretrain_epochs):
         train_loss = train_masked_prediction(masked_model, train_loader, optimizer, criterion, _device)
         print(f"Pretraining Epoch {epoch+1}/{PRETRAIN_EPOCHS} | Train Loss: {train_loss:.4f}")
 
     # --- Transfer Weights for Fine-Tuning ---
     regressor_model = TransformerRegressor(
-        input_dim=n_features, seq_len=WINDOW_SIZE,
+        input_dim=n_features, seq_len=window_size,
         d_model=D_MODEL, n_heads=N_HEADS, n_layers=N_LAYERS, feedforward_dim=FEEDFORWARD_DIM, dropout=DROPOUT,
         learnable_positional_encoding=learnable_positional_encoding
     ).to(_device)
@@ -209,7 +218,7 @@ def predict(X_test: np.ndarray, path: str, learnable_positional_encoding: bool):
     
     # --- Load Pretrained Model ---
     regressor_model = TransformerRegressor(input_dim=int(X_test.shape[2]),  # Feature count after drops
-                                        seq_len=WINDOW_SIZE, d_model=D_MODEL, n_heads=N_HEADS, n_layers=N_LAYERS,
+                                        seq_len=X_test.shape[1], d_model=D_MODEL, n_heads=N_HEADS, n_layers=N_LAYERS,
                                         feedforward_dim=FEEDFORWARD_DIM, dropout=DROPOUT, learnable_positional_encoding=learnable_positional_encoding).to(_device)
     regressor_model.load_state_dict(torch.load(path))
     regressor_model.eval()

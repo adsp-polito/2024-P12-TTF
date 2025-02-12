@@ -14,6 +14,7 @@ SAVGOL_WINDOW = 11
 SAVGOL_POLYORDER = 1
 TRAIN_VALIDATION_SPLIT = 0.2
 SCALER_PATH = 'saved_models/scaler.skl'
+SCALER_FULL_PATH = 'saved_models/full_scaler.skl'
 FEATURES_TO_REMOVE = ['Nf', 'farB', 'NRc', 'P15', 'P30', 'T24', 'T50']
 
 # Dimensionality reduction parameters:
