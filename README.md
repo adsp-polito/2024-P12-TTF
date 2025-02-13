@@ -9,7 +9,7 @@ Predicting the remaining useful lifetime of a machine is crucial to optimize pre
 
 ## Algorithm
 
-This project aims to develop an algorithm to predict the useful remaining lifetime (RUL) of a plane engine based on physical timeseries exctracted by sensors on the engine. The data used are from the [NASA Turbofan Jet Engine](https://www.kaggle.com/datasets/behrad3d/nasa-cmaps), simulated on C-MAPSS. The chosen solution comprises multiple steps, shortly described below and expansively described in [the report](report.pdf).
+This project aims to develop an algorithm to predict the useful remaining lifetime (RUL) of a plane engine based on physical timeseries exctracted by sensors on the engine. The data used are from the [NASA Turbofan Jet Engine](https://www.kaggle.com/datasets/behrad3d/nasa-cmaps), simulated on C-MAPSS. The chosen solution comprises multiple steps, shortly described below and expansively described in [the report](TTF-P12-Report.pdf).
 
 ### Preprocessing
 
